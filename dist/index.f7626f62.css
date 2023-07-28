@@ -788,4 +788,21 @@ body {
   justify-self: center;
 }
 
+.results a {
+  color: #000;
+  background-color: #eee;
+  flex-direction: column;
+  margin: 10px auto;
+  padding: 40px;
+  font-size: 20px;
+  font-weight: 400;
+  text-decoration: none;
+  display: flex;
+}
+
+.results a:hover {
+  background-color: #f38e82;
+  transition: all .4s;
+}
+
 /*# sourceMappingURL=index.f7626f62.css.map */
