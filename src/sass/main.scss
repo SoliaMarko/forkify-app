@@ -5,22 +5,3 @@
 @import 'searchResults';
 @import 'recipe';
 @import 'upload';
-
-// TEMPORAL
-.results a {
-  display: flex;
-  flex-direction: column;
-  padding: 40px;
-  margin: 10px auto;
-  background-color: #eee;
-
-  font-size: 20px;
-  font-weight: 400;
-  text-decoration: none;
-  color: #000;
-
-  &:hover {
-    background-color: #f38e82;
-    transition: all 0.4s;
-  }
-}
