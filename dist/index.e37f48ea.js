@@ -600,6 +600,7 @@ const controlRecipes = async function() {
         await _model.loadRecipe(id);
         // 2) Rendering recipe
         (0, _recipeViewDefault.default).render(_model.state.recipe);
+    // controlServings();
     } catch (err) {
         (0, _recipeViewDefault.default).renderError();
     }
@@ -626,10 +627,17 @@ const controlPagination = function(goToPage) {
     // 2) Render NEW pagination buttons
     (0, _paginationViewDefault.default).render(_model.state.search);
 };
+const controlServings = function(newServings) {
+    // Update the recipe servings (in state)
+    _model.updateServings(newServings);
+    // Update the recipe view
+    (0, _recipeViewDefault.default).render(_model.state.recipe);
+};
 const init = function() {
     (0, _recipeViewDefault.default).addHandlerRender(controlRecipes);
+    (0, _recipeViewDefault.default).addHandlerUpdateServings(controlServings);
     (0, _searchViewDefault.default).addHandlerSearch(controlSearchResults);
-    (0, _paginationViewDefault.default).addhandlerClick(controlPagination);
+    (0, _paginationViewDefault.default).addHandlerClick(controlPagination);
 };
 init();
 
@@ -1952,6 +1960,7 @@ parcelHelpers.export(exports, "state", ()=>state);
 parcelHelpers.export(exports, "loadRecipe", ()=>loadRecipe);
 parcelHelpers.export(exports, "loadSearchResults", ()=>loadSearchResults);
 parcelHelpers.export(exports, "getSearchResultsPage", ()=>getSearchResultsPage);
+parcelHelpers.export(exports, "updateServings", ()=>updateServings);
 var _regeneratorRuntime = require("regenerator-runtime");
 var _config = require("./config");
 var _helpers = require("./helpers");
@@ -1979,6 +1988,7 @@ const loadRecipe = async function(id) {
             cookingTime: recipe.cooking_time,
             ingredients: recipe.ingredients
         };
+        console.log(recipe);
     } catch (err) {
         // Temp error handling
         console.error(`${err} 🐛🐛`);
@@ -2007,6 +2017,14 @@ const getSearchResultsPage = function(page = state.search.page) {
     const start = (page - 1) * state.search.resultsPerPage;
     const end = page * state.search.resultsPerPage;
     return state.search.results.slice(start, end);
+};
+const updateServings = function(newServings) {
+    // if (Object.keys(state.recipe).length === 0) return;
+    state.recipe.ingredients.forEach((ing)=>{
+        ing.quantity = ing.quantity * newServings / state.recipe.servings;
+    // newQt = oldQt * newServings / oldServings
+    });
+    state.recipe.servings = newServings;
 };
 
 },{"regenerator-runtime":"dXNgZ","./config":"k5Hzs","./helpers":"hGI1E","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"dXNgZ":[function(require,module,exports) {
@@ -2680,6 +2698,14 @@ class RecipeView extends (0, _viewDefault.default) {
             "load"
         ].forEach((ev)=>window.addEventListener(ev, handler));
     }
+    addHandlerUpdateServings(handler) {
+        this._parentElement.addEventListener("click", function(e) {
+            const btn = e.target.closest(".btn--update-servings");
+            if (!btn) return;
+            const { updateTo } = btn.dataset;
+            if (+updateTo > 0) handler(+updateTo);
+        });
+    }
     _generateMarkup() {
         return `
       <figure class="recipe__fig">
@@ -2705,12 +2731,12 @@ class RecipeView extends (0, _viewDefault.default) {
           <span class="recipe__info-text">servings</span>
 
           <div class="recipe__info-buttons">
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--update-servings btn--decrease-servings" data-update-to="${this._data.servings - 1}">
               <svg>
                 <use href="${0, _iconsSvgDefault.default}#icon-minus-circle"></use>
               </svg>
             </button>
-            <button class="btn--tiny btn--increase-servings">
+            <button class="btn--tiny btn--update-servings btn--increase-servings" data-update-to="${this._data.servings + 1}">
               <svg>
                 <use href="${0, _iconsSvgDefault.default}#icon-plus-circle"></use>
               </svg>
@@ -3183,7 +3209,7 @@ var _iconsSvg = require("url:../../img/icons.svg");
 var _iconsSvgDefault = parcelHelpers.interopDefault(_iconsSvg);
 class PaginationView extends (0, _viewDefault.default) {
     _parentElement = document.querySelector(".pagination");
-    addhandlerClick(handler) {
+    addHandlerClick(handler) {
         this._parentElement.addEventListener("click", function(e) {
             const btn = e.target.closest(".btn--inline");
             if (!btn) return;
@@ -3219,6 +3245,6 @@ class PaginationView extends (0, _viewDefault.default) {
 }
 exports.default = new PaginationView();
 
-},{"./View":"5cUXS","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3","url:../../img/icons.svg":"loVOp"}]},["aD7Zm","aenu9"], "aenu9", "parcelRequire3a11")
+},{"./View":"5cUXS","url:../../img/icons.svg":"loVOp","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}]},["aD7Zm","aenu9"], "aenu9", "parcelRequire3a11")
 
 //# sourceMappingURL=index.e37f48ea.js.map
