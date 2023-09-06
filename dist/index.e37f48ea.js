@@ -631,7 +631,8 @@ const controlServings = function(newServings) {
     // Update the recipe servings (in state)
     _model.updateServings(newServings);
     // Update the recipe view
-    (0, _recipeViewDefault.default).render(_model.state.recipe);
+    // recipeView.render(model.state.recipe);
+    (0, _recipeViewDefault.default).update(_model.state.recipe);
 };
 const init = function() {
     (0, _recipeViewDefault.default).addHandlerRender(controlRecipes);
@@ -2807,6 +2808,23 @@ class View {
         const markup = this._generateMarkup();
         this._clearElement();
         this._parentElement.insertAdjacentHTML("afterbegin", markup);
+    }
+    update(data) {
+        if (!data || Array.isArray(data) && data.length === 0) return this.renderError();
+        this._data = data;
+        const newMarkup = this._generateMarkup();
+        const newDOM = document.createRange().createContextualFragment(newMarkup);
+        const newElements = Array.from(newDOM.querySelectorAll("*"));
+        const curElements = Array.from(this._parentElement.querySelectorAll("*"));
+        newElements.forEach((newEl, i)=>{
+            const curEl = curElements[i];
+            console.log(curEl, newEl.isEqualNode(curEl));
+            // Updates changes TEXT
+            if (!newEl.isEqualNode(curEl) && newEl.firstChild.nodeValue.trim() !== "") // console.log('😎', newEl.firstChild.nodeValue.trim());
+            curEl.textContent = newEl.textContent;
+            // Updated changes ATTRIBUTES
+            if (!newEl.isEqualNode(curEl)) Array.from(newEl.attributes).forEach((attr)=>curEl.setAttribute(attr.name, attr.value));
+        });
     }
     _clearElement() {
         this._parentElement.innerHTML = "";
